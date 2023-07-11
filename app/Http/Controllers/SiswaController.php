@@ -15,11 +15,11 @@ class SiswaController extends Controller
     public function index(Request $request)
     {
         if($request->has('search')){
-            $siswa = Siswa::where('nama','LIKE','%'.$request->search.'%')->get();
+            $siswas = Siswa::where('nama','LIKE','%'.$request->search.'%')->get();
         }else{
-            $siswa = Siswa::all();
+            $siswas = Siswa::all();
         }
-         return view('siswa.index',['siswa'=>$siswa]);
+         return view('siswa.index',['siswa'=>$siswas]);
     }
      public function create(Request $request)
     {
@@ -66,13 +66,13 @@ class SiswaController extends Controller
     }
     public function edit($nim)
     {
-        $siswa =DB::table('siswa')->where('nim',$nim)->first();
-        return view('siswa/edit', compact('siswa'));
+        $siswas =DB::table('siswas')->where('nim',$nim)->first();
+        return view('siswa/edit', compact('siswas'));
     }
 
     public function editProcess(Request $request, $nim)
     {
-        DB::table('siswa')->where('nim', $nim)
+        DB::table('siswas')->where('nim', $nim)
             ->update([
                 "nim"=>$request->nim,
                  "nama"=>$request->nama,
@@ -87,7 +87,7 @@ class SiswaController extends Controller
    public function delete($nim)
     {
 
-        DB::table('siswa')->where('nim', $nim)->delete();
+        DB::table('siswas')->where('nim', $nim)->delete();
         return redirect('siswa')->with('Success', 'Data Berhasil Dihapus!');
     }
     public function exportexcel()
