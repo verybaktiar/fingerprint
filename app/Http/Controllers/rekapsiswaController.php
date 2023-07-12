@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Siswa;
 use App\Models\Perizinan;
+use App\Models\userfinger;
 use App\Models\Absensi;
 use Illuminate\Http\Request;
 use App\Services\HolidayAPI;
@@ -113,13 +114,23 @@ class RekapSiswaController extends Controller
 
     public function updateStatus(Request $request)
     {
-        $siswaId = $request->input('siswaId');
-        $status = $request->input('status');
+        $siswaNim = $request->input('siswaNim');
+        $statusIzin = $request->input('statusIzin');
 
-        $absensi = Absensi::where('siswa_id', $siswaId)->first(); // Menggunakan kolom 'siswa_id' sebagai kriteria pencarian
-        if ($absensi) {
-            $absensi->status = $status;
-            $absensi->save();
+        $userfinger = userfinger::where('name', $siswaNim)->first();
+        $check_absen = Absensi::where(['id_user'=>$userfinger->id])->first();
+
+        $data_absen = [
+            'id_user' => $userfinger->id,
+            'tanggal' => date('Y-m-d'),
+            'waktu' => date('Y-m-d H:m:s'),
+            'status' => $statusIzin
+        ];
+
+        if(!empty($check_absen)){
+            Absensi::where(['id_user'=>$userfinger->id])->update($data_absen);
+        }else{
+            Absensi::create($data_absen);
         }
 
         return response()->json(['message' => 'Status berhasil diperbarui']);

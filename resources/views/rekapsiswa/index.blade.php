@@ -103,7 +103,7 @@
                         if (rowData.status === '-' && rowData.hari !== 'Sabtu' && rowData.hari !== 'Minggu') {
                             tableRow +=
                                 '<td>' +
-                                '<select class="status-dropdown" data-siswa-nim="' + rowData.siswaNim + '">' +
+                                '<select class="status-dropdown-'+ rowData.tanggal +'">' +
                                 '<option value="">Pilih Status</option>' +
                                 '<option value="Sakit">Sakit</option>' +
                                 '<option value="Izin">Izin</option>' +
@@ -114,7 +114,7 @@
                         }
 
                         tableRow += '<td>' + rowData.keterangan + '</td>' +
-                            '<td><button class="saveBtn" data-siswa-nim="' + rowData.siswaNim + '">Save</button></td>' +
+                            '<td><button class="saveBtn-'+ rowData.tanggal +'" attr-nim="' + rowData.id_user + '" attr-tanggal="'+ rowData.tanggal +'">Save</button></td>' +
                             '</tr>';
 
                         dataTable.append(tableRow);
@@ -122,35 +122,40 @@
 
                     $('#dataTable').addClass('table-responsive');
 
-                    $('.status-dropdown').on('change', function () {
-                        $(this).parent().addClass('edited');
-                    });
+                    $('[class*=saveBtn-]').on('click', function () {
+                        var siswaNim = $('#siswa').val();
+                        var getTanggal = $(this).attr('attr-tanggal');
+                        var statusIzin = $('.status-dropdown-'+getTanggal).val();
 
-                    $('.saveBtn').on('click', function () {
-                        var siswaNim = $(this).data('siswa-nim');
-                        var editedRow = $('.edited[data-siswa-nim="' + siswaNim + '"]');
-                        var statusDropdown = editedRow.find('.status-dropdown');
-                        var status = statusDropdown.val();
+                        console.log(siswaNim);
+                        console.log(getTanggal);
+                        console.log(statusIzin);
 
                         $.ajax({
                             url: '/rekapsiswa/updateStatus',
                             type: 'POST',
                             data: {
+                                _token : '{{csrf_token()}}',
                                 siswaNim: siswaNim,
-                                status: status
+                                tanggal: getTanggal,
+                                statusIzin: statusIzin
                             },
                             success: function (response) {
-                                console.log(response);
-                                editedRow.removeClass('edited');
+                                alert(response.message);
                             },
-                            error: function () {
-                                alert('Terjadi kesalahan. Silakan coba lagi.');
+                            error: function(xhr, status, error) {
+                                console.log(xhr);
+                                console.log(status);
+                                console.log(error);
                             }
                         });
                     });
+
                 },
-                error: function () {
-                    alert('Terjadi kesalahan. Silakan coba lagi.');
+                error: function(xhr, status, error) {
+                    console.log(xhr);
+                    console.log(status);
+                    console.log(error);
                 }
             });
         });
